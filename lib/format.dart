@@ -1,11 +1,15 @@
 /// Display helpers shared by the screens.
 library;
 
-/// money(399) -> "$3.99". Amounts from the API are in cents.
-String money(int cents, [String currency = 'USD']) {
-  final value = (cents / 100).toStringAsFixed(2);
+/// money(399) -> "$3.99", money(819000, 'NGN') -> "₦8,190". Amounts from the
+/// API are in minor units (cents, kobo).
+String money(int amount, [String currency = 'USD']) {
+  if (currency == 'NGN') return '₦${_thousands((amount / 100).ceil())}';
+  final value = (amount / 100).toStringAsFixed(2);
   return currency == 'USD' ? '\$$value' : '$value $currency';
 }
+
+String _thousands(int n) => n.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (_) => ',');
 
 /// bytes(1610612736) -> "1.5 GB"
 String bytes(int n) {

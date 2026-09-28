@@ -16,14 +16,18 @@ class LogoMark extends StatelessWidget {
 }
 
 class _MarkPainter extends CustomPainter {
-  _MarkPainter(this.color);
+  _MarkPainter(this.color, {this.letter = false});
   final Color color;
+
+  /// Crops to the letter itself (viewBox "19.5 6 70.5 94.5"): the bottom edge
+  /// is the baseline, for use inside the wordmark.
+  final bool letter;
 
   @override
   void paint(Canvas canvas, Size size) {
     // Same geometry as the SVG, whose viewBox is "15 2 80 103".
-    final s = size.height / 103;
-    canvas.translate(-15 * s, -2 * s);
+    final s = size.height / (letter ? 94.5 : 103);
+    canvas.translate((letter ? -19.5 : -15) * s, (letter ? -6 : -2) * s);
     final stroke = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
@@ -35,26 +39,40 @@ class _MarkPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_MarkPainter old) => old.color != color;
+  bool shouldRepaint(_MarkPainter old) => old.color != color || old.letter != letter;
 }
 
+/// The wordmark: the Orbit mark stands in for the "a" of aebello.
 class Logo extends StatelessWidget {
   const Logo({super.key, this.size = 22, this.color = Colors.black});
   final double size;
   final Color color;
 
   @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      LogoMark(size: size * 1.1, color: color),
-      SizedBox(width: size * 0.35),
-      Text(
-        'Aebello',
-        style: display(size, color: color, weight: FontWeight.w700),
+  Widget build(BuildContext context) {
+    // Sized so the bowl matches the x-height of "ebello", as on the website.
+    final h = size * 0.72;
+    return Semantics(
+      label: 'Aebello',
+      excludeSemantics: true,
+      child: Text.rich(
+        TextSpan(
+          children: [
+            WidgetSpan(
+              alignment: PlaceholderAlignment.aboveBaseline,
+              baseline: TextBaseline.alphabetic,
+              child: Padding(
+                padding: EdgeInsets.only(right: size * 0.03),
+                child: CustomPaint(size: Size(h * 70.5 / 94.5, h), painter: _MarkPainter(color, letter: true)),
+              ),
+            ),
+            const TextSpan(text: 'ebello'),
+          ],
+        ),
+        style: display(size, color: color, weight: FontWeight.w700).copyWith(height: 1),
       ),
-    ],
-  );
+    );
+  }
 }
 
 class Flag extends StatelessWidget {

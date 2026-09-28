@@ -6,6 +6,7 @@ void main() {
   test('money formats cents as dollars', () {
     expect(money(399), r'$3.99');
     expect(money(2549), r'$25.49');
+    expect(money(819000, 'NGN'), '₦8,190');
   });
 
   test('bytes picks GB or MB', () {

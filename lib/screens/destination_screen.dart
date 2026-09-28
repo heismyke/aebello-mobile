@@ -183,7 +183,17 @@ class PlanCard extends StatelessWidget {
         const Padding(padding: EdgeInsets.symmetric(vertical: 16), child: Divider()),
         Row(
           children: [
-            Text(money(plan.price), style: display(24)),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(money(plan.price), style: display(24)),
+                if (plan.charge case (final amount, final currency))
+                  Text(
+                    '≈ ${money(amount, currency)} at checkout',
+                    style: const TextStyle(color: AppColors.muted, fontSize: 12),
+                  ),
+              ],
+            ),
             const Spacer(),
             FilledButton(
               onPressed: onBuy,

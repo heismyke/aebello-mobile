@@ -60,6 +60,7 @@ class Plan {
     required this.price,
     required this.currency,
     required this.networks,
+    this.charge,
   });
   final String slug;
   final String name;
@@ -71,6 +72,9 @@ class Plan {
   final int price; // cents
   final String currency;
   final List<Network> networks;
+
+  /// What checkout collects when it differs from price, e.g. (819000, NGN).
+  final (int, String)? charge;
 
   bool get isCountry => kind == 'country';
 
@@ -85,6 +89,7 @@ class Plan {
     price: j['price'],
     currency: j['currency'],
     networks: Network.list(j['networks']),
+    charge: j['charge'] == null ? null : (j['charge']['amount'] as int, j['charge']['currency'] as String),
   );
 }
 
